@@ -123,6 +123,14 @@ function loadAdPerformanceCSV(): AdPerformance[] {
   });
 }
 
+export function getCreatorName(): string {
+  const csvPath = path.join(process.cwd(), "data", "daily-per-ad.csv");
+  const raw = fs.readFileSync(csvPath, "utf-8");
+  const firstDataLine = raw.trim().split("\n")[1] || "";
+  const parts = firstDataLine.split(",");
+  return parts[1]?.trim() || "Creator";
+}
+
 // ---- Public API ----
 
 export function getMonthlyEarnings(): MonthlySpend[] {

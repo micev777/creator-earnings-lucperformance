@@ -2,11 +2,13 @@ import {
   getMonthlyEarnings,
   getAdSummaries,
   getDailySpendData,
+  getCreatorName,
 } from "@/lib/data";
 import {
   getMonthlyEarningsLive,
   getAdSummariesLive,
   getDailySpendDataLive,
+  getCreatorNameLive,
 } from "@/lib/google-sheets";
 import {
   getCommissionStructure,
@@ -19,31 +21,28 @@ export const dynamic = "force-dynamic";
 export default async function Home() {
   const useLive = process.env.USE_GOOGLE_SHEETS === "true";
 
-  let monthlyEarnings, adSummaries, dailySpend;
+  let monthlyEarnings, adSummaries, dailySpend, creatorName;
 
   if (useLive) {
-    [monthlyEarnings, adSummaries, dailySpend] = await Promise.all([
+    [monthlyEarnings, adSummaries, dailySpend, creatorName] = await Promise.all([
       getMonthlyEarningsLive(),
       getAdSummariesLive(),
       getDailySpendDataLive(),
+      getCreatorNameLive(),
     ]);
   } else {
     monthlyEarnings = getMonthlyEarnings();
     adSummaries = getAdSummaries();
     dailySpend = getDailySpendData();
+    creatorName = getCreatorName();
   }
 
   const totalSpend = monthlyEarnings.reduce((sum, m) => sum + m.totalSpend, 0);
   const totalEarnings =
-    Math.round(
-      monthlyEarnings.reduce((sum, m) => sum + m.earnings, 0) * 100
-    ) / 100;
+    Math.round(monthlyEarnings.reduce((sum, m) => sum + m.earnings, 0) * 100) / 100;
   const topAd = adSummaries[0];
   const commissionStructure = getCommissionStructure();
   const commissionDescription = getCommissionDescription(commissionStructure);
-  const creatorName = process.env.CREATOR_NAME || "Creator";
-
-  // Latest month data for tier progress
   const latestMonth = monthlyEarnings[monthlyEarnings.length - 1];
 
   const totalStats = {
@@ -54,7 +53,7 @@ export default async function Home() {
     topAdSpend: topAd?.totalSpend || 0,
     commissionDescription,
     commissionStructure,
-    creatorName,
+    creatorName: creatorName || "Creator",
     currentMonthSpend: latestMonth?.totalSpend || 0,
     currentMonth: latestMonth?.month || "",
   };

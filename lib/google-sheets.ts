@@ -94,6 +94,11 @@ export async function getMonthlyEarningsLive() {
     }));
 }
 
+export async function getCreatorNameLive(): Promise<string> {
+  const rows = await fetchRange("Daily per ad!B2:B2");
+  return rows[0]?.[0]?.trim() || "Creator";
+}
+
 export async function getDailySpendDataLive() {
   const rows = await fetchRange("Daily Spend!A2:C100");
 
