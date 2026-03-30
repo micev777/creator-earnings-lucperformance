@@ -28,40 +28,6 @@ function formatCurrency(val: number): string {
   return `£${val.toFixed(2)}`;
 }
 
-function getShortAdName(name: string): string {
-  // Extract the hook variant (H1, H2, etc.) and theme
-  const hookMatch = name.match(/_H(\d+)/);
-  const hook = hookMatch ? `H${hookMatch[1]}` : "";
-
-  // Get the theme/angle
-  const themes = ["Fertility", "Gut", "Microplastics"];
-  const theme = themes.find((t) => name.includes(t)) || "";
-
-  // Get product
-  const product = name.includes("_LD_") ? "Laundry" : name.includes("_DS_") ? "Dishwasher" : "";
-
-  // Get the performance tag
-  const isPerformance = name.includes("PlyskaPerformance");
-  const isGenova = name.includes("PlyskaGenova");
-  const isBrownNut = name.includes("BrownNut");
-
-  let label = "";
-  if (isPerformance && theme) {
-    label = `${product} - ${theme} ${hook}`;
-  } else if (isGenova || isBrownNut) {
-    label = `ASC - ${isBrownNut ? "BrownNut" : ""} Genova ${hook}`;
-  } else {
-    // Fallback: use last meaningful segments
-    const parts = name.split("_").filter(
-      (p) =>
-        !["DIP", "Video", "9x16", "Copy", "INV", ""].includes(p) &&
-        !p.match(/^\d+$/)
-    );
-    label = parts.slice(-3).join(" ");
-  }
-
-  return label || name.slice(0, 35);
-}
 
 type SortField = "totalSpend" | "avgCTR" | "avgHookRate" | "avgROAS" | "totalImpressions" | "avgHoldRate";
 
@@ -75,9 +41,10 @@ export default function AdsView({ adSummaries, totalStats }: Props) {
 
   const displayed = showAll ? sorted : sorted.slice(0, 10);
 
-  // Top 8 for chart
-  const chartData = sorted.slice(0, 8).map((ad) => ({
-    name: getShortAdName(ad.adName),
+  // Top 8 for chart — use rank number on Y-axis, full name in tooltip
+  const chartData = sorted.slice(0, 8).map((ad, i) => ({
+    name: `#${i + 1}`,
+    fullName: ad.adName,
     spend: ad.totalSpend,
     earnings: ad.earnings,
   }));
@@ -119,7 +86,7 @@ export default function AdsView({ adSummaries, totalStats }: Props) {
         </h2>
         <div className="h-72">
           <ResponsiveContainer width="100%" height="100%">
-            <BarChart data={chartData} layout="vertical" margin={{ left: 140 }}>
+            <BarChart data={chartData} layout="vertical" margin={{ left: 8 }}>
               <CartesianGrid strokeDasharray="3 3" stroke="#f1f5f9" />
               <XAxis
                 type="number"
@@ -129,18 +96,24 @@ export default function AdsView({ adSummaries, totalStats }: Props) {
               <YAxis
                 type="category"
                 dataKey="name"
-                tick={{ fontSize: 11, fill: "#374151" }}
-                width={140}
+                tick={{ fontSize: 12, fill: "#374151", fontWeight: 600 }}
+                width={32}
               />
               <Tooltip
                 formatter={(value: any, name: any) => [
                   formatCurrency(Number(value)),
                   name === "spend" ? "Ad Spend" : "Your Earnings",
                 ]}
+                labelFormatter={(label: any, payload: any) =>
+                  payload?.[0]?.payload?.fullName || label
+                }
                 contentStyle={{
                   borderRadius: "8px",
                   border: "1px solid #e2e8f0",
                   boxShadow: "0 4px 6px -1px rgb(0 0 0 / 0.1)",
+                  maxWidth: "300px",
+                  whiteSpace: "normal",
+                  fontSize: "12px",
                 }}
               />
               <Bar
@@ -213,9 +186,9 @@ export default function AdsView({ adSummaries, totalStats }: Props) {
                       {i + 1}
                     </span>
                   </td>
-                  <td className="py-3 pr-4">
-                    <p className="text-sm font-medium text-gray-900 leading-tight">
-                      {getShortAdName(ad.adName)}
+                  <td className="py-3 pr-4 max-w-xs">
+                    <p className="text-sm font-medium text-gray-900 leading-tight break-all">
+                      {ad.adName}
                     </p>
                   </td>
                   <td className="py-3 pr-4 text-right text-sm text-gray-600">

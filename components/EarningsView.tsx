@@ -35,23 +35,6 @@ function formatCurrency(val: number): string {
   return `£${val.toFixed(2)}`;
 }
 
-function formatAdName(name: string): string {
-  // Extract meaningful part from long ad names
-  const parts = name.split("_");
-  // Try to find the descriptive part
-  const meaningful = parts.filter(
-    (p) =>
-      !p.match(/^\d+$/) &&
-      p !== "DIP" &&
-      p !== "Video" &&
-      p !== "9x16" &&
-      p !== "Copy" &&
-      p !== "INV" &&
-      p !== "LD" &&
-      p !== "DS"
-  );
-  return meaningful.slice(-3).join(" ") || name.slice(0, 40);
-}
 
 export default function EarningsView({
   monthlyEarnings,
@@ -88,8 +71,8 @@ export default function EarningsView({
         </div>
         <div className="bg-white rounded-xl border border-gray-200 p-6">
           <p className="text-sm text-gray-500 mb-1">Top Performing Ad</p>
-          <p className="text-sm font-semibold text-gray-900 leading-tight">
-            {formatAdName(totalStats.topAd)}
+          <p className="text-xs font-semibold text-gray-900 leading-tight break-all">
+            {totalStats.topAd}
           </p>
           <p className="text-xs text-emerald-600 mt-2">
             {formatCurrency(totalStats.topAdSpend)} spend
