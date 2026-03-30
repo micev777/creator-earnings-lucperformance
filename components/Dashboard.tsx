@@ -15,6 +15,10 @@ interface Props {
     topAd: string;
     topAdSpend: number;
     commissionDescription: string;
+    commissionStructure: string;
+    creatorName: string;
+    currentMonthSpend: number;
+    currentMonth: string;
   };
   dailySpend: { date: string; spend: number }[];
 }
@@ -43,6 +47,10 @@ export default function Dashboard({
                 </h1>
                 <p className="text-xs text-gray-500">Dip Performance</p>
               </div>
+            </div>
+            <div className="text-right">
+              <p className="text-xs text-gray-400">Creator</p>
+              <p className="text-sm font-semibold text-gray-900">{totalStats.creatorName}</p>
             </div>
           </div>
         </div>
@@ -93,7 +101,8 @@ export default function Dashboard({
       <footer className="border-t border-gray-200 bg-white mt-12">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
           <p className="text-xs text-gray-400 text-center">
-            Earnings calculated at {totalStats.commissionDescription}. Data refreshes automatically.
+            Earnings calculated at {totalStats.commissionDescription}. Data
+            refreshes automatically.
           </p>
         </div>
       </footer>

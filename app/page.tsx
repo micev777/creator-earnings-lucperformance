@@ -8,10 +8,13 @@ import {
   getAdSummariesLive,
   getDailySpendDataLive,
 } from "@/lib/google-sheets";
-import { getCommissionStructure, getCommissionDescription } from "@/lib/commission";
+import {
+  getCommissionStructure,
+  getCommissionDescription,
+} from "@/lib/commission";
 import Dashboard from "@/components/Dashboard";
 
-export const dynamic = "force-dynamic"; // Always fetch fresh data
+export const dynamic = "force-dynamic";
 
 export default async function Home() {
   const useLive = process.env.USE_GOOGLE_SHEETS === "true";
@@ -31,9 +34,17 @@ export default async function Home() {
   }
 
   const totalSpend = monthlyEarnings.reduce((sum, m) => sum + m.totalSpend, 0);
-  const totalEarnings = Math.round(monthlyEarnings.reduce((sum, m) => sum + m.earnings, 0) * 100) / 100;
+  const totalEarnings =
+    Math.round(
+      monthlyEarnings.reduce((sum, m) => sum + m.earnings, 0) * 100
+    ) / 100;
   const topAd = adSummaries[0];
-  const commissionDescription = getCommissionDescription(getCommissionStructure());
+  const commissionStructure = getCommissionStructure();
+  const commissionDescription = getCommissionDescription(commissionStructure);
+  const creatorName = process.env.CREATOR_NAME || "Creator";
+
+  // Latest month data for tier progress
+  const latestMonth = monthlyEarnings[monthlyEarnings.length - 1];
 
   const totalStats = {
     totalSpend: Math.round(totalSpend * 100) / 100,
@@ -42,6 +53,10 @@ export default async function Home() {
     topAd: topAd?.adName || "N/A",
     topAdSpend: topAd?.totalSpend || 0,
     commissionDescription,
+    commissionStructure,
+    creatorName,
+    currentMonthSpend: latestMonth?.totalSpend || 0,
+    currentMonth: latestMonth?.month || "",
   };
 
   return (

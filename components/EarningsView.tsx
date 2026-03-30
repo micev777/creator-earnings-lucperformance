@@ -12,6 +12,7 @@ import {
   AreaChart,
   Area,
 } from "recharts";
+import TierProgress from "./TierProgress";
 
 interface Props {
   monthlyEarnings: MonthlySpend[];
@@ -22,6 +23,10 @@ interface Props {
     topAd: string;
     topAdSpend: number;
     commissionDescription: string;
+    commissionStructure: string;
+    creatorName: string;
+    currentMonthSpend: number;
+    currentMonth: string;
   };
   dailySpend: { date: string; spend: number }[];
 }
@@ -143,6 +148,14 @@ export default function EarningsView({
           </table>
         </div>
       </div>
+
+      {/* Tier Progress — only shown for tiered commission */}
+      {totalStats.commissionStructure === "tiered_option_b" && (
+        <TierProgress
+          currentMonthSpend={totalStats.currentMonthSpend}
+          currentMonth={totalStats.currentMonth}
+        />
+      )}
 
       {/* Monthly Bar Chart */}
       <div className="bg-white rounded-xl border border-gray-200 p-6">
