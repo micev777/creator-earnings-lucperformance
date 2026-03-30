@@ -1,7 +1,10 @@
 import fs from "fs";
 import path from "path";
-
-const COMMISSION_RATE = 0.05; // 5%
+import {
+  getCommissionStructure,
+  calculateMonthlyCommission,
+  getEffectiveRate,
+} from "./commission";
 
 export interface DailySpend {
   month: number;
@@ -146,12 +149,14 @@ export function getMonthlyEarnings(): MonthlySpend[] {
     "December",
   ];
 
+  const structure = getCommissionStructure();
+
   return Array.from(monthMap.entries())
     .sort((a, b) => a[0] - b[0])
     .map(([month, totalSpend]) => ({
       month: monthNames[month] || `Month ${month}`,
       totalSpend: Math.round(totalSpend * 100) / 100,
-      earnings: Math.round(totalSpend * COMMISSION_RATE * 100) / 100,
+      earnings: Math.round(calculateMonthlyCommission(totalSpend, structure) * 100) / 100,
     }));
 }
 
@@ -208,11 +213,15 @@ export function getAdSummaries(): AdSummary[] {
     adMap.set(ad.adName, existing);
   }
 
+  const structure = getCommissionStructure();
+  const totalSpendAll = Array.from(adMap.values()).reduce((s, d) => s + d.totalSpend, 0);
+  const effectiveRate = getEffectiveRate(totalSpendAll, structure);
+
   return Array.from(adMap.entries())
     .map(([adName, data]) => ({
       adName,
       totalSpend: Math.round(data.totalSpend * 100) / 100,
-      earnings: Math.round(data.totalSpend * COMMISSION_RATE * 100) / 100,
+      earnings: Math.round(data.totalSpend * effectiveRate * 100) / 100,
       totalImpressions: data.totalImpressions,
       totalPurchases: data.totalPurchases,
       avgCTR: Math.round((data.ctrSum / data.count) * 100) / 100,
@@ -230,7 +239,7 @@ export function getTotalStats() {
   const ads = getAdSummaries();
 
   const totalSpend = monthly.reduce((sum, m) => sum + m.totalSpend, 0);
-  const totalEarnings = Math.round(totalSpend * COMMISSION_RATE * 100) / 100;
+  const totalEarnings = Math.round(monthly.reduce((sum, m) => sum + m.earnings, 0) * 100) / 100;
   const topAd = ads[0];
 
   return {

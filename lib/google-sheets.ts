@@ -1,4 +1,9 @@
 import { google } from "googleapis";
+import {
+  getCommissionStructure,
+  calculateMonthlyCommission,
+  getEffectiveRate,
+} from "./commission";
 
 // ---- Google Sheets API data fetcher ----
 // This module replaces the CSV-based data loading with live Google Sheets reads.
@@ -7,10 +12,9 @@ import { google } from "googleapis";
 //   GOOGLE_SHEETS_SPREADSHEET_ID  – the ID from the sheet URL
 //   GOOGLE_SERVICE_ACCOUNT_EMAIL  – service account email
 //   GOOGLE_SERVICE_ACCOUNT_KEY    – the private key (JSON-escaped)
+//   COMMISSION_STRUCTURE          – "flat" (default) or "tiered_option_b"
 //
 // The sheet must be shared with the service account email (Viewer access is enough).
-
-const COMMISSION_RATE = 0.05;
 
 function parseCurrency(val: string): number {
   if (!val) return 0;
@@ -79,12 +83,14 @@ export async function getMonthlyEarningsLive() {
     "December",
   ];
 
+  const structure = getCommissionStructure();
+
   return Array.from(monthMap.entries())
     .sort((a, b) => a[0] - b[0])
     .map(([month, totalSpend]) => ({
       month: monthNames[month] || `Month ${month}`,
       totalSpend: Math.round(totalSpend * 100) / 100,
-      earnings: Math.round(totalSpend * COMMISSION_RATE * 100) / 100,
+      earnings: Math.round(calculateMonthlyCommission(totalSpend, structure) * 100) / 100,
     }));
 }
 
@@ -147,11 +153,15 @@ export async function getAdSummariesLive() {
     adMap.set(adName, existing);
   }
 
+  const structure = getCommissionStructure();
+  const totalSpendAll = Array.from(adMap.values()).reduce((s, d) => s + d.totalSpend, 0);
+  const effectiveRate = getEffectiveRate(totalSpendAll, structure);
+
   return Array.from(adMap.entries())
     .map(([adName, data]) => ({
       adName,
       totalSpend: Math.round(data.totalSpend * 100) / 100,
-      earnings: Math.round(data.totalSpend * COMMISSION_RATE * 100) / 100,
+      earnings: Math.round(data.totalSpend * effectiveRate * 100) / 100,
       totalImpressions: data.totalImpressions,
       totalPurchases: data.totalPurchases,
       avgCTR: Math.round((data.ctrSum / data.count) * 100) / 100,

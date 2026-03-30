@@ -20,6 +20,7 @@ interface Props {
     totalAds: number;
     topAd: string;
     topAdSpend: number;
+    commissionDescription: string;
   };
 }
 

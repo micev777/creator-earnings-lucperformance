@@ -21,6 +21,7 @@ interface Props {
     totalAds: number;
     topAd: string;
     topAdSpend: number;
+    commissionDescription: string;
   };
   dailySpend: { date: string; spend: number }[];
 }
@@ -74,7 +75,7 @@ export default function EarningsView({
           <p className="text-xs text-gray-400 mt-1">Across all campaigns</p>
         </div>
         <div className="bg-gradient-to-br from-[#1e3a5f] to-[#2d5a8e] rounded-xl p-6 text-white">
-          <p className="text-sm text-blue-200 mb-1">Your Earnings (5%)</p>
+          <p className="text-sm text-blue-200 mb-1">Your Earnings</p>
           <p className="text-3xl font-bold">
             {formatCurrency(totalStats.totalEarnings)}
           </p>
@@ -102,7 +103,7 @@ export default function EarningsView({
               <tr className="text-left text-xs text-gray-500 uppercase tracking-wider border-b border-gray-100">
                 <th className="pb-3 pr-4">Month</th>
                 <th className="pb-3 pr-4 text-right">Ad Spend</th>
-                <th className="pb-3 pr-4 text-right">Your Earnings (5%)</th>
+                <th className="pb-3 pr-4 text-right">Your Earnings</th>
                 <th className="pb-3 text-right">Status</th>
               </tr>
             </thead>
