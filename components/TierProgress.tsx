@@ -150,7 +150,7 @@ export default function TierProgress({ currentMonthSpend, currentMonth }: Props)
         </div>
       )}
 
-      {/* Mini tier summary */}
+      {/* Marginal breakdown — shows how much has been earned in each bracket */}
       <div className="mt-4 pt-4 border-t border-gray-100 grid grid-cols-3 gap-2 text-center">
         <div>
           <p className="text-xs text-gray-400">Earned at 3%</p>

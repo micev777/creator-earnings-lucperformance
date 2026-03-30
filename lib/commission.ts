@@ -4,18 +4,20 @@
 export type CommissionStructure = "flat" | "tiered_option_b";
 
 /**
- * Calculate earnings based on total monthly spend using the appropriate structure.
- * For tiered structures, this must be called on the MONTHLY total, not per-row.
+ * Calculate earnings based on total monthly spend.
+ *
+ * Option B uses a MARGINAL (tax-bracket) structure:
+ *   3% on the first £50,000
+ *   4% on the portion between £50,000 – £100,000
+ *   5% on the portion above £100,000
+ *
+ * e.g. £75,000 spend = (£50,000 × 3%) + (£25,000 × 4%) = £1,500 + £1,000 = £2,500
  */
 export function calculateMonthlyCommission(
   monthlySpend: number,
   structure: CommissionStructure
 ): number {
   if (structure === "tiered_option_b") {
-    // Option B: "The Killer"
-    // 3% on first £50,000
-    // 4% on £50,000 – £100,000
-    // 5% above £100,000
     if (monthlySpend <= 50000) {
       return monthlySpend * 0.03;
     } else if (monthlySpend <= 100000) {
@@ -29,8 +31,8 @@ export function calculateMonthlyCommission(
 }
 
 /**
- * Returns the effective commission rate across all spend (total earnings / total spend).
- * Used to approximate per-ad earnings proportionally.
+ * Returns the effective commission rate (total earnings / total spend).
+ * Used to distribute earnings proportionally across ads.
  */
 export function getEffectiveRate(
   totalSpend: number,
