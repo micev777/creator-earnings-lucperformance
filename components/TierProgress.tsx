@@ -40,13 +40,6 @@ function getStatus(spend: number) {
   }
 }
 
-function getExtraEarningsAtNextTier(spend: number, amountToNext: number): number {
-  // Extra earnings per £1,000 at next tier vs current tier
-  if (spend < 50000) {
-    return (amountToNext * (0.04 - 0.03));
-  }
-  return (amountToNext * (0.05 - 0.04));
-}
 
 export default function TierProgress({ currentMonthSpend, currentMonth }: Props) {
   const status = getStatus(currentMonthSpend);
@@ -139,13 +132,6 @@ export default function TierProgress({ currentMonthSpend, currentMonth }: Props)
             <div>
               <p className="text-sm font-semibold text-amber-900">
                 {formatCurrency(status.amountToNext)} more spend to unlock {status.nextTier.label}
-              </p>
-              <p className="text-xs text-amber-700 mt-1">
-                Hit {formatCurrency(status.tierEnd!)} this month and earn an extra{" "}
-                <span className="font-semibold">
-                  £{getExtraEarningsAtNextTier(currentMonthSpend, status.amountToNext).toFixed(0)}
-                </span>{" "}
-                in commission on top of what you've already earned.
               </p>
             </div>
           </div>

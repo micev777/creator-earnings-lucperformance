@@ -97,6 +97,14 @@ export default function EarningsView({
         </div>
       </div>
 
+      {/* Tier Progress — only shown for tiered commission */}
+      {totalStats.commissionStructure === "tiered_option_b" && (
+        <TierProgress
+          currentMonthSpend={totalStats.currentMonthSpend}
+          currentMonth={totalStats.currentMonth}
+        />
+      )}
+
       {/* Monthly Earnings Breakdown */}
       <div className="bg-white rounded-xl border border-gray-200 p-6">
         <h2 className="text-lg font-semibold text-gray-900 mb-4">
@@ -148,14 +156,6 @@ export default function EarningsView({
           </table>
         </div>
       </div>
-
-      {/* Tier Progress — only shown for tiered commission */}
-      {totalStats.commissionStructure === "tiered_option_b" && (
-        <TierProgress
-          currentMonthSpend={totalStats.currentMonthSpend}
-          currentMonth={totalStats.currentMonth}
-        />
-      )}
 
       {/* Monthly Bar Chart */}
       <div className="bg-white rounded-xl border border-gray-200 p-6">

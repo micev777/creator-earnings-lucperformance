@@ -3,12 +3,14 @@ import {
   getAdSummaries,
   getDailySpendData,
   getCreatorName,
+  getCurrentMonthSpend,
 } from "@/lib/data";
 import {
   getMonthlyEarningsLive,
   getAdSummariesLive,
   getDailySpendDataLive,
   getCreatorNameLive,
+  getCurrentMonthSpendLive,
 } from "@/lib/google-sheets";
 import {
   getCommissionStructure,
@@ -21,20 +23,23 @@ export const dynamic = "force-dynamic";
 export default async function Home() {
   const useLive = process.env.USE_GOOGLE_SHEETS === "true";
 
-  let monthlyEarnings, adSummaries, dailySpend, creatorName;
+  let monthlyEarnings, adSummaries, dailySpend, creatorName, currentMonthSpend;
 
   if (useLive) {
-    [monthlyEarnings, adSummaries, dailySpend, creatorName] = await Promise.all([
-      getMonthlyEarningsLive(),
-      getAdSummariesLive(),
-      getDailySpendDataLive(),
-      getCreatorNameLive(),
-    ]);
+    [monthlyEarnings, adSummaries, dailySpend, creatorName, currentMonthSpend] =
+      await Promise.all([
+        getMonthlyEarningsLive(),
+        getAdSummariesLive(),
+        getDailySpendDataLive(),
+        getCreatorNameLive(),
+        getCurrentMonthSpendLive(),
+      ]);
   } else {
     monthlyEarnings = getMonthlyEarnings();
     adSummaries = getAdSummaries();
     dailySpend = getDailySpendData();
     creatorName = getCreatorName();
+    currentMonthSpend = getCurrentMonthSpend();
   }
 
   const totalSpend = monthlyEarnings.reduce((sum, m) => sum + m.totalSpend, 0);
@@ -43,7 +48,10 @@ export default async function Home() {
   const topAd = adSummaries[0];
   const commissionStructure = getCommissionStructure();
   const commissionDescription = getCommissionDescription(commissionStructure);
-  const latestMonth = monthlyEarnings[monthlyEarnings.length - 1];
+
+  // Current month name
+  const now = new Date();
+  const currentMonthName = now.toLocaleString("en-GB", { month: "long" });
 
   const totalStats = {
     totalSpend: Math.round(totalSpend * 100) / 100,
@@ -54,8 +62,8 @@ export default async function Home() {
     commissionDescription,
     commissionStructure,
     creatorName: creatorName || "Creator",
-    currentMonthSpend: latestMonth?.totalSpend || 0,
-    currentMonth: latestMonth?.month || "",
+    currentMonthSpend: currentMonthSpend || 0,
+    currentMonth: currentMonthName,
   };
 
   return (

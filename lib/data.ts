@@ -131,6 +131,22 @@ export function getCreatorName(): string {
   return parts[1]?.trim() || "Creator";
 }
 
+export function getCurrentMonthSpend(): number {
+  const ads = loadAdPerformanceCSV();
+  const now = new Date();
+  const currentYear = now.getFullYear();
+  const currentMonth = now.getMonth() + 1;
+
+  return Math.round(
+    ads
+      .filter((ad) => {
+        const date = new Date(ad.date);
+        return date.getFullYear() === currentYear && date.getMonth() + 1 === currentMonth;
+      })
+      .reduce((sum, ad) => sum + ad.spend, 0) * 100
+  ) / 100;
+}
+
 // ---- Public API ----
 
 export function getMonthlyEarnings(): MonthlySpend[] {

@@ -99,6 +99,24 @@ export async function getCreatorNameLive(): Promise<string> {
   return rows[0]?.[0]?.trim() || "Creator";
 }
 
+export async function getCurrentMonthSpendLive(): Promise<number> {
+  const rows = await fetchRange("Daily per ad!A2:C5000");
+  const now = new Date();
+  const currentYear = now.getFullYear();
+  const currentMonth = now.getMonth() + 1; // 1-indexed
+
+  let total = 0;
+  for (const row of rows) {
+    const dateStr = row[0];
+    if (!dateStr) continue;
+    const date = new Date(dateStr);
+    if (date.getFullYear() === currentYear && date.getMonth() + 1 === currentMonth) {
+      total += parseCurrency(row[2]);
+    }
+  }
+  return Math.round(total * 100) / 100;
+}
+
 export async function getDailySpendDataLive() {
   const rows = await fetchRange("Daily Spend!A2:C100");
 
