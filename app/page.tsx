@@ -3,14 +3,12 @@ import {
   getAdSummaries,
   getDailySpendData,
   getCreatorName,
-  getCurrentMonthSpend,
 } from "@/lib/data";
 import {
   getMonthlyEarningsLive,
   getAdSummariesLive,
   getDailySpendDataLive,
   getCreatorNameLive,
-  getCurrentMonthSpendLive,
 } from "@/lib/google-sheets";
 import {
   getCommissionStructure,
@@ -23,23 +21,21 @@ export const dynamic = "force-dynamic";
 export default async function Home() {
   const useLive = process.env.USE_GOOGLE_SHEETS === "true";
 
-  let monthlyEarnings, adSummaries, dailySpend, creatorName, currentMonthSpend;
+  let monthlyEarnings, adSummaries, dailySpend, creatorName;
 
   if (useLive) {
-    [monthlyEarnings, adSummaries, dailySpend, creatorName, currentMonthSpend] =
+    [monthlyEarnings, adSummaries, dailySpend, creatorName] =
       await Promise.all([
         getMonthlyEarningsLive(),
         getAdSummariesLive(),
         getDailySpendDataLive(),
         getCreatorNameLive(),
-        getCurrentMonthSpendLive(),
       ]);
   } else {
     monthlyEarnings = getMonthlyEarnings();
     adSummaries = getAdSummaries();
     dailySpend = getDailySpendData();
     creatorName = getCreatorName();
-    currentMonthSpend = getCurrentMonthSpend();
   }
 
   const totalSpend = monthlyEarnings.reduce((sum, m) => sum + m.totalSpend, 0);
@@ -52,6 +48,11 @@ export default async function Home() {
   // Current month name
   const now = new Date();
   const currentMonthName = now.toLocaleString("en-GB", { month: "long" });
+
+  // Current month spend — derived from the monthly earnings array so it's
+  // always consistent with what the monthly table shows. Tiers reset monthly.
+  const currentMonthEntry = monthlyEarnings.find((m) => m.month === currentMonthName);
+  const currentMonthSpend = currentMonthEntry?.totalSpend || 0;
 
   const totalStats = {
     totalSpend: Math.round(totalSpend * 100) / 100,
