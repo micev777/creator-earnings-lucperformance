@@ -100,7 +100,7 @@ export default function EarningsView({
       {/* Tier Progress — only shown for tiered commission */}
       {totalStats.commissionStructure === "tiered_option_b" && (
         <TierProgress
-          currentMonthSpend={totalStats.currentMonthSpend}
+          currentMonthSpend={totalStats.totalSpend}
           currentMonth={totalStats.currentMonth}
         />
       )}
