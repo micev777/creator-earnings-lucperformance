@@ -60,7 +60,7 @@ export default async function Home() {
   const totalStats = {
     totalSpend: currentMonthSpend,
     totalEarnings: currentMonthEarnings,
-    totalAds: adSummaries.length,
+    totalAds: currentMonthAdSummaries.length,
     topAd: topAd?.adName || "N/A",
     topAdSpend: topAd?.totalSpend || 0,
     commissionDescription,
@@ -73,7 +73,7 @@ export default async function Home() {
   return (
     <Dashboard
       monthlyEarnings={monthlyEarnings}
-      adSummaries={adSummaries}
+      adSummaries={currentMonthAdSummaries}
       totalStats={totalStats}
       dailySpend={dailySpend}
     />

@@ -2,15 +2,6 @@
 
 import { useState } from "react";
 import type { AdSummary } from "@/lib/data";
-import {
-  BarChart,
-  Bar,
-  XAxis,
-  YAxis,
-  CartesianGrid,
-  Tooltip,
-  ResponsiveContainer,
-} from "recharts";
 
 interface Props {
   adSummaries: AdSummary[];
@@ -21,13 +12,13 @@ interface Props {
     topAd: string;
     topAdSpend: number;
     commissionDescription: string;
+    currentMonth: string;
   };
 }
 
 function formatCurrency(val: number): string {
   return `£${val.toFixed(2)}`;
 }
-
 
 type SortField = "totalSpend" | "avgCTR" | "avgHookRate" | "avgROAS" | "totalImpressions" | "avgHoldRate";
 
@@ -41,98 +32,40 @@ export default function AdsView({ adSummaries, totalStats }: Props) {
 
   const displayed = showAll ? sorted : sorted.slice(0, 10);
 
-  // Top 8 for chart — use rank number on Y-axis, full name in tooltip
-  const chartData = sorted.slice(0, 8).map((ad, i) => ({
-    name: `#${i + 1}`,
-    fullName: ad.adName,
-    spend: ad.totalSpend,
-    earnings: ad.earnings,
-  }));
-
   return (
     <div className="space-y-6">
       {/* Summary Stats */}
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
         <div className="bg-white rounded-xl border border-gray-200 p-5">
           <p className="text-sm text-gray-500 mb-1">Total Ads</p>
           <p className="text-2xl font-bold text-gray-900">
             {totalStats.totalAds}
           </p>
+          <p className="text-xs text-gray-400 mt-1">{totalStats.currentMonth}</p>
         </div>
         <div className="bg-white rounded-xl border border-gray-200 p-5">
           <p className="text-sm text-gray-500 mb-1">Total Spend</p>
           <p className="text-2xl font-bold text-gray-900">
             {formatCurrency(totalStats.totalSpend)}
           </p>
+          <p className="text-xs text-gray-400 mt-1">{totalStats.currentMonth}</p>
         </div>
         <div className="bg-gradient-to-br from-[#1e3a5f] to-[#2d5a8e] rounded-xl p-5 text-white">
-          <p className="text-sm text-blue-200 mb-1">Your Total Earnings</p>
+          <p className="text-sm text-blue-200 mb-1">Your Earnings</p>
           <p className="text-2xl font-bold">
             {formatCurrency(totalStats.totalEarnings)}
           </p>
-        </div>
-        <div className="bg-white rounded-xl border border-gray-200 p-5">
-          <p className="text-sm text-gray-500 mb-1">Best Ad Earnings</p>
-          <p className="text-2xl font-bold text-emerald-600">
-            {formatCurrency(sorted[0]?.earnings || 0)}
-          </p>
+          <p className="text-xs text-blue-200 mt-1">{totalStats.currentMonth}</p>
         </div>
       </div>
 
-      {/* Top Ads Chart */}
-      <div className="bg-white rounded-xl border border-gray-200 p-6">
-        <h2 className="text-lg font-semibold text-gray-900 mb-4">
-          Top Performing Ads by Spend
-        </h2>
-        <div className="h-72">
-          <ResponsiveContainer width="100%" height="100%">
-            <BarChart data={chartData} layout="vertical" margin={{ left: 8 }}>
-              <CartesianGrid strokeDasharray="3 3" stroke="#f1f5f9" />
-              <XAxis
-                type="number"
-                tick={{ fontSize: 12, fill: "#64748b" }}
-                tickFormatter={(v) => `£${v}`}
-              />
-              <YAxis
-                type="category"
-                dataKey="name"
-                tick={{ fontSize: 12, fill: "#374151", fontWeight: 600 }}
-                width={32}
-              />
-              <Tooltip
-                formatter={(value: any, name: any) => [
-                  formatCurrency(Number(value)),
-                  name === "spend" ? "Ad Spend" : "Your Earnings",
-                ]}
-                labelFormatter={(label: any, payload: any) =>
-                  payload?.[0]?.payload?.fullName || label
-                }
-                contentStyle={{
-                  borderRadius: "8px",
-                  border: "1px solid #e2e8f0",
-                  boxShadow: "0 4px 6px -1px rgb(0 0 0 / 0.1)",
-                  maxWidth: "300px",
-                  whiteSpace: "normal",
-                  fontSize: "12px",
-                }}
-              />
-              <Bar
-                dataKey="spend"
-                fill="#1e3a5f"
-                radius={[0, 4, 4, 0]}
-                name="spend"
-              />
-            </BarChart>
-          </ResponsiveContainer>
-        </div>
-      </div>
-
-      {/* Detailed Ad Table */}
+      {/* All Ads Ranked Table */}
       <div className="bg-white rounded-xl border border-gray-200 p-6">
         <div className="flex items-center justify-between mb-4">
-          <h2 className="text-lg font-semibold text-gray-900">
-            All Ads — Ranked
-          </h2>
+          <div>
+            <h2 className="text-lg font-semibold text-gray-900">All Ads — Ranked</h2>
+            <p className="text-xs text-gray-400 mt-0.5">{totalStats.currentMonth} performance</p>
+          </div>
           <div className="flex items-center gap-2">
             <span className="text-xs text-gray-500">Sort by:</span>
             <select
