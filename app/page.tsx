@@ -38,9 +38,6 @@ export default async function Home() {
     creatorName = getCreatorName();
   }
 
-  const totalSpend = monthlyEarnings.reduce((sum, m) => sum + m.totalSpend, 0);
-  const totalEarnings =
-    Math.round(monthlyEarnings.reduce((sum, m) => sum + m.earnings, 0) * 100) / 100;
   const topAd = adSummaries[0];
   const commissionStructure = getCommissionStructure();
   const commissionDescription = getCommissionDescription(commissionStructure);
@@ -49,14 +46,15 @@ export default async function Home() {
   const now = new Date();
   const currentMonthName = now.toLocaleString("en-GB", { month: "long" });
 
-  // Current month spend — derived from the monthly earnings array so it's
-  // always consistent with what the monthly table shows. Tiers reset monthly.
+  // Current month entry — used for summary cards and tier progress.
+  // Tiers reset monthly, so all top-level figures reflect the current month only.
   const currentMonthEntry = monthlyEarnings.find((m) => m.month === currentMonthName);
   const currentMonthSpend = currentMonthEntry?.totalSpend || 0;
+  const currentMonthEarnings = Math.round((currentMonthEntry?.earnings || 0) * 100) / 100;
 
   const totalStats = {
-    totalSpend: Math.round(totalSpend * 100) / 100,
-    totalEarnings,
+    totalSpend: currentMonthSpend,
+    totalEarnings: currentMonthEarnings,
     totalAds: adSummaries.length,
     topAd: topAd?.adName || "N/A",
     topAdSpend: topAd?.totalSpend || 0,

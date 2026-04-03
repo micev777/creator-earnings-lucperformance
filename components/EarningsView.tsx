@@ -60,14 +60,14 @@ export default function EarningsView({
           <p className="text-3xl font-bold text-gray-900">
             {formatCurrency(totalStats.totalSpend)}
           </p>
-          <p className="text-xs text-gray-400 mt-1">Across all campaigns</p>
+          <p className="text-xs text-gray-400 mt-1">{totalStats.currentMonth} spend</p>
         </div>
         <div className="bg-gradient-to-br from-[#1e3a5f] to-[#2d5a8e] rounded-xl p-6 text-white">
           <p className="text-sm text-blue-200 mb-1">Your Earnings</p>
           <p className="text-3xl font-bold">
             {formatCurrency(totalStats.totalEarnings)}
           </p>
-          <p className="text-xs text-blue-200 mt-1">Total commission earned</p>
+          <p className="text-xs text-blue-200 mt-1">{totalStats.currentMonth} commission</p>
         </div>
         <div className="bg-white rounded-xl border border-gray-200 p-6">
           <p className="text-sm text-gray-500 mb-1">Top Performing Ad</p>
@@ -123,12 +123,12 @@ export default function EarningsView({
                   <td className="py-4 text-right">
                     <span
                       className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
-                        i === monthlyEarnings.length - 1
+                        m.month === totalStats.currentMonth
                           ? "bg-blue-50 text-blue-700"
                           : "bg-emerald-50 text-emerald-700"
                       }`}
                     >
-                      {i === monthlyEarnings.length - 1
+                      {m.month === totalStats.currentMonth
                         ? "In Progress"
                         : "Complete"}
                     </span>
