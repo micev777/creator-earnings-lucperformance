@@ -128,7 +128,7 @@ export async function getDailySpendDataLive() {
     }));
 }
 
-export async function getAdSummariesLive() {
+export async function getAdSummariesLive(monthFilter?: { month: number; year: number }) {
   // Fetch all rows from the "Daily per ad" sheet
   const rows = await fetchRange("Daily per ad!A2:P5000");
 
@@ -150,6 +150,19 @@ export async function getAdSummariesLive() {
   for (const row of rows) {
     const adName = row[5] || "";
     if (!adName) continue;
+
+    // If a month filter is provided, skip rows outside that month
+    if (monthFilter) {
+      const dateStr = row[0];
+      if (!dateStr) continue;
+      const date = new Date(dateStr);
+      if (
+        date.getFullYear() !== monthFilter.year ||
+        date.getMonth() + 1 !== monthFilter.month
+      ) {
+        continue;
+      }
+    }
 
     const existing = adMap.get(adName) || {
       totalSpend: 0,

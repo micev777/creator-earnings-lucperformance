@@ -36,11 +36,17 @@ function formatCurrency(val: number): string {
 }
 
 
+const MONTH_NAMES = [
+  "January", "February", "March", "April", "May", "June",
+  "July", "August", "September", "October", "November", "December",
+];
+
 export default function EarningsView({
   monthlyEarnings,
   totalStats,
   dailySpend,
 }: Props) {
+  const currentMonthIndex = MONTH_NAMES.indexOf(totalStats.currentMonth);
   // Prepare daily chart data with cumulative earnings
   const chartData = dailySpend.map((d) => ({
     date: new Date(d.date).toLocaleDateString("en-GB", {
@@ -123,14 +129,14 @@ export default function EarningsView({
                   <td className="py-4 text-right">
                     <span
                       className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
-                        m.month === totalStats.currentMonth
-                          ? "bg-blue-50 text-blue-700"
-                          : "bg-emerald-50 text-emerald-700"
+                        MONTH_NAMES.indexOf(m.month) < currentMonthIndex
+                          ? "bg-emerald-50 text-emerald-700"
+                          : "bg-blue-50 text-blue-700"
                       }`}
                     >
-                      {m.month === totalStats.currentMonth
-                        ? "In Progress"
-                        : "Complete"}
+                      {MONTH_NAMES.indexOf(m.month) < currentMonthIndex
+                        ? "Complete"
+                        : "In Progress"}
                     </span>
                   </td>
                 </tr>
