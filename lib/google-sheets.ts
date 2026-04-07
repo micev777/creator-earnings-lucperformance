@@ -53,14 +53,19 @@ async function fetchRange(range: string): Promise<string[][]> {
 // ---- Public API (mirrors the CSV-based functions in data.ts) ----
 
 export async function getMonthlyEarningsLive() {
-  const rows = await fetchRange("Daily Spend!A2:F100");
+  const rows = await fetchRange("Daily Spend!A2:F5000");
 
-  // The sheet has monthly totals in columns E and F
-  // But we also compute from daily data as a fallback
+  // Use the actual date in column B to determine the month.
+  // Column A (month number) can be unreliable if the sheet tags late-arriving
+  // data under the wrong month. The real date is the source of truth.
   const monthMap = new Map<number, number>();
 
   for (const row of rows) {
-    const month = parseInt(row[0]) || 0;
+    const dateStr = row[1]; // column B: actual date
+    if (!dateStr) continue;
+    const date = new Date(dateStr);
+    if (isNaN(date.getTime())) continue;
+    const month = date.getMonth() + 1; // 1-indexed
     const spend = parseCurrency(row[2]);
     if (month > 0) {
       monthMap.set(month, (monthMap.get(month) || 0) + spend);
@@ -118,7 +123,7 @@ export async function getCurrentMonthSpendLive(): Promise<number> {
 }
 
 export async function getDailySpendDataLive() {
-  const rows = await fetchRange("Daily Spend!A2:C100");
+  const rows = await fetchRange("Daily Spend!A2:C5000");
 
   return rows
     .filter((row) => row[1] && parseCurrency(row[2]) > 0)
